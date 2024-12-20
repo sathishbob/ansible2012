@@ -1,0 +1,8 @@
+---
+- hosts: localhost
+  tasks:
+  - name: Create a resource group
+    azure.azcollection.azure_rm_resourcegroup:
+      name: sathish
+      force_delete_nonempty: true
+      state: absent

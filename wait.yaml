@@ -1,0 +1,12 @@
+---
+- hosts: ubuntu
+  tasks:
+  - name: Check whether a port is listening
+    wait_for:
+      host: localhost
+      port: 81
+      delay: 10
+      timeout: 30
+      state: started
+      msg: "Web server is running"
+    ignore_errors: true

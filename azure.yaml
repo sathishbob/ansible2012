@@ -1,0 +1,70 @@
+---
+- hosts: localhost
+  tasks:
+  - name: Create a resource group
+    azure.azcollection.azure_rm_resourcegroup:
+      name: sathish
+      location: Central India
+    register: rg
+
+  - name: Create a virtual network
+    azure_rm_virtualnetwork:
+      name: sathishvnet
+      resource_group: sathish
+      address_prefixes_cidr: "10.0.0.0/16"
+    register: vnet
+
+  - name: Crete subnet
+    azure_rm_subnet:
+      resource_group: sathish
+      virtual_network_name: sathishvnet
+      name: sathishsubnet
+      address_prefix_cidr: "10.0.0.0/24"
+
+  - name: Create a public ip address
+    azure_rm_publicipaddress:
+      resource_group: sathish
+      name: sathishpublicip
+      allocation_method: Dynamic
+
+  - name: Create a network interface 
+    azure_rm_networkinterface:
+      name: sathishnic
+      resource_group: sathish
+      virtual_network: sathishvnet
+      subnet_name: sathishsubnet
+      ip_configurations:
+      - name: ipconfig1
+        public_ip_address_name: sathishpublicip
+        primary: true
+
+  - name: Create a security group
+    azure_rm_securitygroup:
+      resource_group: sathish
+      name: sathishnsg
+      rules:
+      - name: 'AllowSSH'
+        protocol: Tcp
+        source_address_prefix: "*"
+        source_port_range: "*"
+        destination_port_range: 22
+        destination_address_prefix: "*"
+        access: Allow
+        priority: 100
+        direction: Inbound
+
+  - name: Create VM with defaults
+    azure_rm_virtualmachine:
+      resource_group: sathish
+      name: sathishvm
+      location: Central India
+      vm_size: Standard_D2s_v3
+      admin_username: azureuser
+      admin_password: Training@123
+      network_interfaces: sathishnic
+      image:
+        offer: UbuntuServer
+        publisher: Canonical
+        sku: 18.04-LTS
+        version: 18.04.202401161
+

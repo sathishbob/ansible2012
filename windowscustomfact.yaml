@@ -1,0 +1,36 @@
+---
+- name: Copy PowerShell custom fact and display it
+  hosts: win
+  gather_facts: yes
+  tasks:
+
+    - name: Ensure facts.d directory exists
+      ansible.windows.win_file:
+        path: C:\ProgramData\Ansible\facts.d
+        state: directory
+
+    - name: Copy PowerShell script to generate custom facts
+      ansible.windows.win_copy:
+        src: custom_fact.ps1  # Local path to the script
+        dest: C:\ProgramData\Ansible\facts.d\custom_fact.ps1
+
+    - name: Gather facts to refresh and include the custom PowerShell fact
+      ansible.builtin.setup:
+        filter: ansible_local
+
+    - name: Display the custom fact - company name
+      ansible.builtin.debug:
+        msg: "Company Name: {{ ansible_local.custom_fact.company_name }}"
+
+    - name: Display the custom fact - server role
+      ansible.builtin.debug:
+        msg: "Server Role: {{ ansible_local.custom_fact.server_role }}"
+
+    - name: Display the custom fact - environment
+      ansible.builtin.debug:
+        msg: "Environment: {{ ansible_local.custom_fact.environment }}"
+
+    - name: Display the custom fact - system uptime
+      ansible.builtin.debug:
+        msg: "System Uptime: {{ ansible_local.custom_fact.uptime }}"
+

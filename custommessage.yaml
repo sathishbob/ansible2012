@@ -1,0 +1,16 @@
+---
+- hosts: ubuntu
+  tasks:
+  - name: Get the file content
+    command:
+      cat training
+    register: filecontent
+  - name: Print log when file is empty
+    debug:
+      msg: File is empty
+    when: filecontent.stdout==""
+  - name: Print log file is not empty
+    debug:
+      msg: File is not empty
+    when: filecontent.stdout!=""
+

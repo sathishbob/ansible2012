@@ -1,0 +1,21 @@
+---
+- hosts: ubuntu
+  tasks:
+  - name: Copy sript to the node
+    copy:
+      src: /etc/ansible/playbooks/program.sh
+      dest: /home/ansible/program.sh
+      mode: 0755
+  - name: Modify the script contnet
+    lineinfile:
+      path: /home/ansible/program.sh
+      regexp: '^HOST='
+      line: HOST={{ ansible_hostname }}
+      state: present
+  - name: Run the script
+    shell: /home/ansible/program.sh
+    register: output
+  - name: Pring script output
+    debug:
+      msg: Output of tthe script is "{{ output.stdout }}"
+

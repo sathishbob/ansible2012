@@ -1,0 +1,41 @@
+---
+- hosts: ubuntu
+  become: yes
+  tasks:
+  - name: Install NTP Service
+    apt:
+      name: ntp
+      state: latest
+      update_cache: yes
+  - name: Start NTP Service
+    service:
+      name: ntp
+      state: started
+  - name: Configure NTP Service
+    block:
+      - name: Create NTP configuration file
+        template:
+          src: /etc/ansible/playbooks/ntp.conf.j2
+          dest: /etc/ntp.conf
+
+      - name: Enable NTP service
+        service:
+          name: ntp
+          enabled: true
+    rescue:
+      - name: Remove NTP config file
+        file:
+          path: /etc/ntp.conf
+          state: absent
+      - name: Uninstall ntp
+        apt:
+          name: ntp
+          state: absent
+      - name: Print log in case of failure in configuring ntp
+        debug:
+          msg: "Failled to configure the NTP service"
+
+    always:
+      - name: Print Log
+        debug: 
+          msg: "NTP servic configured sucessfully"

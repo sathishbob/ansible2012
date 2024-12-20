@@ -1,0 +1,7 @@
+---
+- hosts: ubuntu
+  tasks:
+  - name: print nested loop variable
+    debug:
+      msg: "{{ item[0] }} CM tool is {{ item[1] }} to use"
+    loop: "{{ [ 'chef', 'puppet', 'ansible'] | product([ 'hard', 'medium', 'easy']) | list }}"
